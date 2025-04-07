@@ -76,6 +76,22 @@ Uncomment the last seven lines in chapter1_main_basic.py to test multiple querie
 
 If everything works, you have achieved to set up the Agent Development Kit correctly. Let’s deep dive on the key components of the basic agent starting with Chapter 1. Then, follow the increamental implementation of Chapter 2 and 3. Have fun!!!
 
+For Chapter 4, you need some additional prerequisites. First, enable CloudTrace API by visiting the service page at Google Cloud Project console. Then, install AgentEngine dependencies:
+
+```shell
+pip3 install "google-cloud-aiplatform[agent_engines] @ git+https://github.com/googleapis/python-aiplatform.git@copybara_744144054" --force-reinstall --quiet
+```
+
+Note that the remote agent at AgentEngine could be supported only in Python '3.8', '3.9', '3.10', '3.11', '3.12' at the moment.
+
+## Contributing
+
+We welcome contributions from the community! Whether it's bug reports, feature requests, documentation improvements, or code contributions.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.
+
 ## Author
 
 Dr Sokratis Kartakis
