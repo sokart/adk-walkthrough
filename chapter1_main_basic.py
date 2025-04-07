@@ -7,7 +7,9 @@ from google.adk.artifacts import InMemoryArtifactService
 from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
 from google.genai import types
-from utils.setup_env import init_and_get_env_vars
+
+from dotenv import load_dotenv
+load_dotenv()
 
 # Get the model ID from the environment variable
 MODEL = os.getenv("MODEL", "gemini-2.0-flash-001") # The model ID for the agent
@@ -46,6 +48,7 @@ def send_query_to_agent(agent, query):
     events = runner.run(user_id='user', session_id=session.id, new_message=content)
 
     final_response = None
+    elapsed_time_ms = 0.0
 
     # Loop through the events returned by the runner
     for _, event in enumerate(events):

@@ -9,6 +9,9 @@ from google.genai import types
 
 from agent_maths.agent import agent_math
 
+from dotenv import load_dotenv
+load_dotenv()
+
 # Get the model ID from the environment variable
 MODEL = os.getenv("MODEL", "gemini-2.0-flash-001") # The model ID for the agent
 AGENT_APP_NAME = 'single_agent'
@@ -46,6 +49,7 @@ def send_query_to_agent(agent, query):
     events = runner.run(user_id='user', session_id=session.id, new_message=content)
 
     final_response = None
+    elapsed_time_ms = 0.0
 
     # Loop through the events returned by the runner
     for _, event in enumerate(events):
