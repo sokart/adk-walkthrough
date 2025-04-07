@@ -27,6 +27,8 @@ GOOGLE_CLOUD_LOCATION = os.getenv("GOOGLE_CLOUD_LOCATION")
 
 AGENT_ENGINE_BUCKET = f"ae-{GOOGLE_CLOUD_PROJECT}-{GOOGLE_CLOUD_LOCATION}-bucket"
 
+IS_REMOTE_DEPLOYMENT = 0
+
 def check_or_create_gcs_bucket_with_url(bucket_name: str, location: str, project_id: str = None) -> Optional[Tuple[str, storage.Bucket]]:
     """
     Checks if a Google Cloud Storage bucket exists. Creates it if it doesn't,
@@ -192,9 +194,22 @@ if __name__ == '__main__':
         sub_agents=[agent_grammar, agent_math, agent_summary],
     )
 
-    app = ADKApp(agent=agent_teaching_assistant, enable_tracing=True,)
+    if(IS_REMOTE_DEPLOYMENT == 0):
+        deployed_agent = ADKApp(agent=agent_teaching_assistant, enable_tracing=True,)
+    else:
+        WHL_FILE = "./wheels/google_adk-0.0.2.dev20250404+nightly743987168-py3-none-any.whl"
 
-    session = app.create_session(user_id="user")
+        deployed_agent = agent_engines.create(
+        agent_teaching_assistant,
+        requirements=[
+            WHL_FILE,
+            "google-cloud-aiplatform[agent_engines] @ git+https://github.com/googleapis/python-aiplatform.git@copybara_744144054",
+        ],
+        extra_packages=[
+            WHL_FILE,
+        ],)
+
+    session = deployed_agent.create_session(user_id="user")
     print("-----------------------------")
     print('>>>  New session details  <<<')
     print("-----------------------------")
@@ -203,12 +218,12 @@ if __name__ == '__main__':
     print("-----------------------------")
     print('>>>>>>  List sessions  <<<<<<')
     print("-----------------------------")
-    print(app.list_sessions(user_id="user"))
+    print(deployed_agent.list_sessions(user_id="user"))
 
     print("-----------------------------")
     print('>>>>>>  Get sessions  <<<<<<')
     print("-----------------------------")
-    session = app.get_session(user_id="user", session_id=session.id)
+    session = deployed_agent.get_session(user_id="user", session_id=session.id)
     print(session)
 
     print("-----------------------------")
@@ -216,7 +231,7 @@ if __name__ == '__main__':
     print("-----------------------------")
     start_time = time.time()
     
-    events = app.stream_query(user_id="user", session_id=session.id,message="Hi teacher. Could she help me to multiply all the numbers between 1 and 10?",)
+    events = deployed_agent.stream_query(user_id="user", session_id=session.id,message="Hi teacher. Could she help me to multiply all the numbers between 1 and 10?",)
     
     end_time = time.time()
     elapsed_time_ms = round((end_time - start_time) * 1000, 3)
