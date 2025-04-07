@@ -4,13 +4,13 @@ Get ready to dive deep and get hands-on with the Google Agent Development Kit! T
 We'll start with the Prerequisites, ensuring your development environment is correctly set up – from installing ADK in a Python virtual environment to configuring necessary access credentials. Running a simple test script will confirm everything is ready to go.
 Then, we'll progress through four core chapters:
 
-**The Basic Agent *(chapter1_main_basic.py)*:** You'll learn how to instantiate your very first agent, defining its core instructions and interacting with it. We'll explore fundamental ADK components like the Agent class, the Runner, and basic session management (InMemorySessionService).
+1. **The Basic Agent *(chapter1_main_basic.py)*:** You'll learn how to instantiate your very first agent, defining its core instructions and interacting with it. We'll explore fundamental ADK components like the Agent class, the Runner, and basic session management (InMemorySessionService).
 
-**Single Agent with Tools *(chapter2_main_single_agent.py)*:** We'll enhance our agent by giving it abilities! You'll see how to create custom tools using simple Python functions (complete with essential docstrings) and how the agent leverages these tools to perform tasks, like mathematical calculations. We'll also cover how to handle the event stream for tool calls and responses.
+2. **Single Agent with Tools *(chapter2_main_single_agent.py)*:** We'll enhance our agent by giving it abilities! You'll see how to create custom tools using simple Python functions (complete with essential docstrings) and how the agent leverages these tools to perform tasks, like mathematical calculations. We'll also cover how to handle the event stream for tool calls and responses.
 
-**Multi-Agent Interaction *(chapter3_main_multi_agent.py)*:** This is where we bring it all together. You'll learn how to design a system where multiple specialized agents collaborate. We'll build an orchestrator agent (a "teacher's assistant") that delegates tasks to child agents (like our math agent and a new grammar agent), demonstrating the power of the sub_agents parameter and defining interaction flows.
+3. **Multi-Agent Interaction *(chapter3_main_multi_agent.py)*:** This is where we bring it all together. You'll learn how to design a system where multiple specialized agents collaborate. We'll build an orchestrator agent (a "teacher's assistant") that delegates tasks to child agents (like our math agent and a new grammar agent), demonstrating the power of the sub_agents parameter and defining interaction flows.
 
-**[Placeholder] Agent Deployment to the Cloud (chapter4_agent_deployment.py):** We'll briefly touch upon the concepts and potential next steps involved in taking your agent application from local development to a live deployment, particularly focusing on cloud environments. 
+4. **[Placeholder] Agent Deployment to the Cloud (chapter4_agent_deployment.py):** We'll briefly touch upon the concepts and potential next steps involved in taking your agent application from local development to a live deployment, particularly focusing on cloud environments. 
 
 Let's get started!
 
