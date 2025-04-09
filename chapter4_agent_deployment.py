@@ -229,8 +229,8 @@ if __name__ == '__main__':
     for event in events:
         parse_event_content(event)
 
-    print("-----------------------------")
-    print('>>> Deleting Remote Agent <<<')
-    print("-----------------------------")
     if(IS_REMOTE_DEPLOYMENT == 1):
+        print("-----------------------------")
+        print('>>> Deleting Remote Agent <<<')
+        print("-----------------------------")
         deployed_agent.delete(force=True)
