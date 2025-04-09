@@ -4,7 +4,7 @@ import json
 
 import vertexai
 from vertexai import agent_engines
-from vertexai.preview.reasoning_engines import ADKApp
+from vertexai.preview.reasoning_engines import AdkApp
 
 from google.adk.agents import SequentialAgent
 
@@ -177,11 +177,11 @@ if __name__ == '__main__':
 
     if result:
         bucket_url, bucket_object = result # Unpack the tuple
-        print(f"\n---> Success!")
+        print(f"\nBucket is ready available to AgentEngine")
         print(f"  Returned URL: {bucket_url}")
         print(f"  Bucket Object Name: {bucket_object.name}")
     else:
-        print(f"\n---> Failed to process bucket '{AGENT_ENGINE_BUCKET}'. Check logs and permissions.")
+        print(f"\nFailed to process AgentEngine bucket '{AGENT_ENGINE_BUCKET}'. Check logs and permissions.")
         exit()
 
     vertexai.init( project=GOOGLE_CLOUD_PROJECT, 
@@ -195,19 +195,9 @@ if __name__ == '__main__':
     )
 
     if(IS_REMOTE_DEPLOYMENT == 0):
-        deployed_agent = ADKApp(agent=agent_teaching_assistant, enable_tracing=True,)
+        deployed_agent = AdkApp(agent=agent_teaching_assistant,enable_tracing=True,)
     else:
-        WHL_FILE = "./wheels/google_adk-0.0.2.dev20250404+nightly743987168-py3-none-any.whl"
-
-        deployed_agent = agent_engines.create(
-        agent_teaching_assistant,
-        requirements=[
-            WHL_FILE,
-            "google-cloud-aiplatform[agent_engines] @ git+https://github.com/googleapis/python-aiplatform.git@copybara_744144054",
-        ],
-        extra_packages=[
-            WHL_FILE,
-        ],)
+        deployed_agent = agent_engines.create(agent_teaching_assistant, requirements=["google-cloud-aiplatform[adk,agent_engines]"])
 
     session = deployed_agent.create_session(user_id="user")
     print("-----------------------------")
@@ -238,3 +228,9 @@ if __name__ == '__main__':
 
     for event in events:
         parse_event_content(event)
+
+    print("-----------------------------")
+    print('>>> Deleting Remote Agent <<<')
+    print("-----------------------------")
+    if(IS_REMOTE_DEPLOYMENT == 1):
+        deployed_agent.delete(force=True)

@@ -34,7 +34,7 @@ source .adk_venv/bin/activate
 Install Agent Development Kit:
 
 ```shell
-pip install google-adk
+pip install google-adk==0.0.5
 ```
 
 ```conf
@@ -79,7 +79,13 @@ If everything works, you have achieved to set up the Agent Development Kit corre
 For Chapter 4, you need some additional prerequisites. First, enable CloudTrace API by visiting the service page at Google Cloud Project console. Then, install AgentEngine dependencies:
 
 ```shell
-pip3 install "google-cloud-aiplatform[agent_engines] @ git+https://github.com/googleapis/python-aiplatform.git@copybara_744144054" --force-reinstall --quiet
+pip3 install google-cloud-aiplatform[agent_engines]
+```
+
+or in ZSH
+
+```shell
+pip3 install 'google-cloud-aiplatform[agent_engines]'
 ```
 
 Note that the remote agent at AgentEngine could be supported only in Python '3.8', '3.9', '3.10', '3.11', '3.12' at the moment.
