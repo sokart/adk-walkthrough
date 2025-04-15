@@ -197,7 +197,7 @@ if __name__ == '__main__':
     if(IS_REMOTE_DEPLOYMENT == 0):
         deployed_agent = AdkApp(agent=agent_teaching_assistant,enable_tracing=True,)
     else:
-        deployed_agent = agent_engines.create(agent_teaching_assistant, requirements=["google-cloud-aiplatform[adk,agent_engines]"])
+        deployed_agent = agent_engines.create(agent_teaching_assistant, requirements=["google-cloud-aiplatform[adk,agent_engines]"], extra_packages = ["./agent_grammar", "./agent_math", "./agent_summary"])
 
     session = deployed_agent.create_session(user_id="user")
     print("-----------------------------")
