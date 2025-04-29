@@ -27,7 +27,7 @@ GOOGLE_CLOUD_LOCATION = os.getenv("GOOGLE_CLOUD_LOCATION")
 
 AGENT_ENGINE_BUCKET = f"ae-{GOOGLE_CLOUD_PROJECT}-{GOOGLE_CLOUD_LOCATION}-bucket"
 
-IS_REMOTE_DEPLOYMENT = 0
+IS_REMOTE_DEPLOYMENT = 1
 
 def check_or_create_gcs_bucket_with_url(bucket_name: str, location: str, project_id: str = None) -> Optional[Tuple[str, storage.Bucket]]:
     """
@@ -195,9 +195,9 @@ if __name__ == '__main__':
     )
 
     if(IS_REMOTE_DEPLOYMENT == 0):
-        deployed_agent = AdkApp(agent=agent_teaching_assistant,enable_tracing=True,)
+         deployed_agent = AdkApp(agent=agent_teaching_assistant,enable_tracing=True,)
     else:
-        deployed_agent = agent_engines.create(agent_teaching_assistant, requirements=["google-cloud-aiplatform[adk,agent_engines]"], extra_packages = ["./agent_grammar", "./agent_math", "./agent_summary"])
+         deployed_agent = agent_engines.create(agent_teaching_assistant, requirements=["google-cloud-aiplatform[adk,agent_engines]"], extra_packages = ["./agent_grammar", "./agent_maths", "./agent_summary"])
 
     session = deployed_agent.create_session(user_id="user")
     print("-----------------------------")
@@ -213,7 +213,7 @@ if __name__ == '__main__':
     print("-----------------------------")
     print('>>>>>>  Get sessions  <<<<<<')
     print("-----------------------------")
-    session = deployed_agent.get_session(user_id="user", session_id=session.id)
+    session = deployed_agent.get_session(user_id="user", session_id=session['id'])
     print(session)
 
     print("-----------------------------")
@@ -221,7 +221,7 @@ if __name__ == '__main__':
     print("-----------------------------")
     start_time = time.time()
     
-    events = deployed_agent.stream_query(user_id="user", session_id=session.id,message="Hi teacher. Could she help me to multiply all the numbers between 1 and 10?",)
+    events = deployed_agent.stream_query(user_id="user", session_id=session['id'],message="Hi teacher. Could she help me to multiply all the numbers between 1 and 10?",)
     
     end_time = time.time()
     elapsed_time_ms = round((end_time - start_time) * 1000, 3)
