@@ -1,5 +1,6 @@
 import os
 import time
+import asyncio
 
 from google.adk.agents import Agent
 from google.adk.artifacts import InMemoryArtifactService
@@ -13,13 +14,13 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Get the model ID from the environment variable
-MODEL = os.getenv("MODEL", "gemini-2.0-flash-001") # The model ID for the agent
+MODEL = os.getenv("MODEL", "gemini-2.0-flash") # The model ID for the agent
 AGENT_APP_NAME = 'single_agent'
 
 session_service = InMemorySessionService()
 artifact_service = InMemoryArtifactService()
 
-def send_query_to_agent(agent, query):
+async def send_query_to_agent(agent, query, user_id="user", session_id="user_session"):
     """Sends a query to the specified agent and prints the response.
 
         Args:
@@ -32,9 +33,9 @@ def send_query_to_agent(agent, query):
 
     # Create a new session - if you want to keep the history of interruction you need to move the 
     # creation of the session outside of this function. Here we create a new session per query
-    session = session_service.create_session(app_name=AGENT_APP_NAME,
-                                             user_id='user',)
-    
+    session = await session_service.create_session(app_name=AGENT_APP_NAME,
+                                                   user_id=user_id,
+                                                   session_id=session_id)
     # Create a content object representing the user's query
     print('\nUser Query: ', query)
     content = types.Content(role='user', parts=[types.Part(text=query)])
@@ -44,15 +45,16 @@ def send_query_to_agent(agent, query):
 
     # Create a runner object to manage the interaction with the agent
     runner = Runner(app_name=AGENT_APP_NAME, agent=agent, artifact_service=artifact_service, session_service=session_service)
+    # Alternatively you can use InMemoryRunner
 
     # Run the interaction with the agent and get a stream of events
-    events = runner.run(user_id='user', session_id=session.id, new_message=content)
+    events = runner.run_async(user_id=user_id, session_id=session_id, new_message=content)
 
     final_response = None
     elapsed_time_ms = 0.0
 
     # Loop through the events returned by the runner
-    for _, event in enumerate(events):
+    async for event in events:
 
         is_final_response = event.is_final_response()
         function_calls = event.get_function_calls()
@@ -97,7 +99,7 @@ def send_query_to_agent(agent, query):
 if __name__ == '__main__':
 
     # Send a single query to the agent
-    send_query_to_agent(agent_math, "First multiply numbers 1 to 3 and then add 4")
+    asyncio.run(send_query_to_agent(agent_math, "First multiply numbers 1 to 3 and then add 4"))
     #send_query_to_agent(agent_math, "How much is 1 and 2 and 3?")
 
     # Send multiple queries against the basic agent
@@ -108,4 +110,4 @@ if __name__ == '__main__':
     # ]
 
     # for query in queries:
-    #     send_query_to_agent(agent_math, query)
+    #     asyncio.run(send_query_to_agent(agent_math, query))

@@ -1,5 +1,6 @@
 import os
 import time
+import asyncio
 
 # Import libraries from the Agent Framework
 from google.adk.agents import Agent
@@ -12,14 +13,14 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Get the model ID from the environment variable
-MODEL = os.getenv("MODEL", "gemini-2.0-flash-001") # The model ID for the agent
+MODEL = os.getenv("MODEL", "gemini-2.0-flash") # The model ID for the agent
 AGENT_APP_NAME = 'agent_basic'
 
 # Create InMemory services for session and artifact management
 session_service = InMemorySessionService()
 artifact_service = InMemoryArtifactService()
 
-def send_query_to_agent(agent, query):
+async def send_query_to_agent(agent, query, user_id="user", session_id="user_session"):
     """Sends a query to the specified agent and prints the response.
 
     Args:
@@ -32,8 +33,9 @@ def send_query_to_agent(agent, query):
 
     # Create a new session - if you want to keep the history of interruction you need to move the 
     # creation of the session outside of this function. Here we create a new session per query
-    session = session_service.create_session(app_name=AGENT_APP_NAME,
-                                             user_id='user',)
+    session = await session_service.create_session(app_name=AGENT_APP_NAME,
+                                                   user_id=user_id,
+                                                   session_id=session_id)
     # Create a content object representing the user's query
     print('\nUser Query: ', query)
     content = types.Content(role='user', parts=[types.Part(text=query)])
@@ -43,15 +45,16 @@ def send_query_to_agent(agent, query):
 
     # Create a runner object to manage the interaction with the agent
     runner = Runner(app_name=AGENT_APP_NAME, agent=agent, artifact_service=artifact_service, session_service=session_service)
+    # Alternatively you can use InMemoryRunner
 
     # Run the interaction with the agent and get a stream of events
-    events = runner.run(user_id='user', session_id=session.id, new_message=content)
+    events = runner.run_async(user_id=user_id, session_id=session_id, new_message=content)
 
     final_response = None
     elapsed_time_ms = 0.0
 
     # Loop through the events returned by the runner
-    for _, event in enumerate(events):
+    async for event in events:
 
         is_final_response = event.is_final_response()
 
@@ -78,13 +81,13 @@ if __name__ == '__main__':
     # Create a basic agent with instructions amd greeting only
     basic_agent = Agent(model=MODEL,
         name="agent_basic",
-        description="This agent responds to inquiries about its creation by stating it was built using the Google Agent Framework.",
-        instruction="If they ask you how you were created, tell them you were created with the Google Agent Framework.",
+        description="This agent responds to inquiries about its creation by stating it was built using the Google Agent Development Kit.",
+        instruction="If they ask you how you were created, tell them you were created with the Google Agent Development Kit.",
         generate_content_config=types.GenerateContentConfig(temperature=0.2),
     )
 
     # Send a single query to the agent
-    send_query_to_agent(basic_agent, "Hi, how are you?")
+    asyncio.run(send_query_to_agent(basic_agent, "Hi, how are you?"))
 
     # Example of sending multiple queries to the agent (commented out)
     # queries = [
@@ -94,4 +97,4 @@ if __name__ == '__main__':
     # ]
 
     # for query in queries:
-    #     send_query_to_agent(basic_agent, query)
+    #     asyncio.run(send_query_to_agent(basic_agent, query))
