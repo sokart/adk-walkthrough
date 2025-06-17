@@ -34,7 +34,7 @@ source .adk_venv/bin/activate
 Install Agent Development Kit:
 
 ```shell
-pip install google-adk
+pip install google-adk==1.3.0
 ```
 
 ```conf
