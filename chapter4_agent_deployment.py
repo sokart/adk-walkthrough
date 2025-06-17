@@ -20,14 +20,14 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Get the model ID from the environment variable
-MODEL = os.getenv("MODEL", "gemini-2.0-flash-001") # The model ID for the agent
+MODEL = os.getenv("MODEL", "gemini-2.0-flash") # The model ID for the agent
 
 GOOGLE_CLOUD_PROJECT = os.getenv("GOOGLE_CLOUD_PROJECT")
 GOOGLE_CLOUD_LOCATION = os.getenv("GOOGLE_CLOUD_LOCATION")
 
 AGENT_ENGINE_BUCKET = f"ae-{GOOGLE_CLOUD_PROJECT}-{GOOGLE_CLOUD_LOCATION}-bucket"
 
-IS_REMOTE_DEPLOYMENT = 1
+IS_REMOTE_DEPLOYMENT = 0
 
 def check_or_create_gcs_bucket_with_url(bucket_name: str, location: str, project_id: str = None) -> Optional[Tuple[str, storage.Bucket]]:
     """
@@ -194,12 +194,20 @@ if __name__ == '__main__':
         sub_agents=[agent_grammar, agent_math, agent_summary],
     )
 
+    deployed_agent_app = AdkApp(agent=agent_teaching_assistant,enable_tracing=True,)
     if(IS_REMOTE_DEPLOYMENT == 0):
-         deployed_agent = AdkApp(agent=agent_teaching_assistant,enable_tracing=True,)
+        deployed_agent = deployed_agent_app
     else:
-         deployed_agent = agent_engines.create(agent_teaching_assistant, requirements=["google-cloud-aiplatform[adk,agent_engines]"], extra_packages = ["./agent_grammar", "./agent_maths", "./agent_summary"])
+         deployed_agent = agent_engines.create(deployed_agent_app, requirements=["google-cloud-aiplatform[adk,agent_engines]"], extra_packages = ["./agent_grammar", "./agent_maths", "./agent_summary"])
 
-    session = deployed_agent.create_session(user_id="user")
+    user_id = "user"
+
+    session = deployed_agent.create_session(user_id=user_id)
+    if(IS_REMOTE_DEPLOYMENT == 0):
+        session_id = session.id
+    else:
+        session_id = session["id"]
+
     print("-----------------------------")
     print('>>>  New session details  <<<')
     print("-----------------------------")
@@ -208,12 +216,12 @@ if __name__ == '__main__':
     print("-----------------------------")
     print('>>>>>>  List sessions  <<<<<<')
     print("-----------------------------")
-    print(deployed_agent.list_sessions(user_id="user"))
+    print(deployed_agent.list_sessions(user_id=user_id))
 
     print("-----------------------------")
     print('>>>>>>  Get sessions  <<<<<<')
     print("-----------------------------")
-    session = deployed_agent.get_session(user_id="user", session_id=session['id'])
+    session = deployed_agent.get_session(user_id=user_id, session_id=session_id)
     print(session)
 
     print("-----------------------------")
@@ -221,7 +229,7 @@ if __name__ == '__main__':
     print("-----------------------------")
     start_time = time.time()
     
-    events = deployed_agent.stream_query(user_id="user", session_id=session['id'],message="Hi teacher. Could she help me to multiply all the numbers between 1 and 10?",)
+    events = deployed_agent.stream_query(user_id=user_id, session_id=session_id,message="Hi teacher. Could she help me to multiply all the numbers between 1 and 10?",)
     
     end_time = time.time()
     elapsed_time_ms = round((end_time - start_time) * 1000, 3)
@@ -233,4 +241,4 @@ if __name__ == '__main__':
         print("-----------------------------")
         print('>>> Deleting Remote Agent <<<')
         print("-----------------------------")
-        deployed_agent.delete(force=True)
+        #deployed_agent.delete(force=True)
